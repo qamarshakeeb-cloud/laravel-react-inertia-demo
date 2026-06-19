@@ -1,10 +1,15 @@
-export default function Employees({ name, role }) {
+export default function Employees({ employees }) {
     return (
         <div>
-            <h1>Employee Page</h1>
+            <h1>Employee List</h1>
 
-            <p>Name: {name}</p>
-            <p>Role: {role}</p>
+            {employees.map((employee) => (
+                <div key={employee.id}>
+                    <p>Name: {employee.name}</p>
+                    <p>Role: {employee.role}</p>
+                    <hr />
+                </div>
+            ))}
         </div>
     );
 }

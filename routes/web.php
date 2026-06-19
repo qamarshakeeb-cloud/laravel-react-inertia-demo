@@ -4,6 +4,7 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Models\Employee;
 
 Route::get('/', function () {
     return Inertia::render('Welcome', [
@@ -29,7 +30,6 @@ require __DIR__.'/auth.php';
 
 Route::get('/employees', function () {
     return Inertia::render('Employees', [
-        'name' => 'Shakeeb',
-        'role' => 'Frontend Developer',
+        'employees' => Employee::all(),
     ]);
 });
