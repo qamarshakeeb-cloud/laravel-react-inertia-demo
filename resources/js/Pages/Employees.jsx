@@ -1,8 +1,8 @@
 
 import { useState } from 'react';
-import { useForm } from '@inertiajs/react';
+import { useForm, router } from '@inertiajs/react';
 
-export default function Employees({ employees }) {
+export default function Employees({ employees, search }) {
     const [editingId, setEditingId] = useState(null);
 
     const { data, setData, post, patch, delete: destroy, errors, reset } = useForm({
@@ -36,6 +36,21 @@ export default function Employees({ employees }) {
     return (
         <div>
             <h1>Employee List</h1>
+            <input
+    type="text"
+    placeholder="Search employee..."
+    defaultValue={search}
+    onChange={(e) =>
+        router.get(
+            '/employees',
+            { search: e.target.value },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        )
+    }
+/>
             <p>Editing ID: {editingId}</p>
 
             <form onSubmit={submit}>

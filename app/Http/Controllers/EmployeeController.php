@@ -3,15 +3,26 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\Employee;
 use Inertia\Inertia;
 
 class EmployeeController extends Controller
 {
-    public function index()
-    {
-        $employees = Employee::all();
-        return Inertia::render('Employees', compact('employees'));
-    }
+    public function index(Request $request)
+{
+    $search = $request->search;
+
+    $employees = Employee::query()
+        ->when($search, function ($query) use ($search) {
+            $query->where('name', 'like', "%{$search}%");
+        })
+        ->get();
+
+    return Inertia::render('Employees', [
+        'employees' => $employees,
+        'search' => $search,
+    ]);
+}
 
     public function store(Request $request)
     {
