@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { useForm, router } from '@inertiajs/react';
 
 export default function Employees({ employees, search }) {
+
+        console.log(employees.links);
+
     const [editingId, setEditingId] = useState(null);
 
     const { data, setData, post, patch, delete: destroy, errors, reset } = useForm({
@@ -87,36 +90,52 @@ export default function Employees({ employees, search }) {
 
             <hr />
 
-            {employees.map((employee) => (
-                <div key={employee.id}>
-                    <p>Name: {employee.name}</p>
-                    <p>Role: {employee.role}</p>
+            {employees.data.map((employee) => (
+    <div key={employee.id}>
+        <p>Name: {employee.name}</p>
+        <p>Role: {employee.role}</p>
 
-                    <button
-    onClick={() => {
-        setEditingId(employee.id);
+        <button
+            onClick={() => {
+                setEditingId(employee.id);
 
-        setData({
-            name: employee.name,
-            role: employee.role,
-        });
-    }}
->
-    Edit
-</button>
+                setData({
+                    name: employee.name,
+                    role: employee.role,
+                });
+            }}
+        >
+            Edit
+        </button>
 
-<button
-    onClick={() => {
-        destroy(`/employees/${employee.id}`);
-    }}
->
-    Delete
-</button>
+        <button
+            onClick={() => {
+                destroy(`/employees/${employee.id}`);
+            }}
+        >
+            Delete
+        </button>
 
+        <hr />
+    </div>
+))}
 
-                    <hr />
-                </div>
-            ))}
-        </div>
+<div style={{ marginTop: '20px' }}>
+    {employees.links.map((link, index) => (
+        <button
+            key={index}
+            onClick={() => link.url && router.visit(link.url)}
+            disabled={!link.url}
+            style={{
+                margin: '5px',
+                fontWeight: link.active ? 'bold' : 'normal',
+            }}
+        >
+            {link.label.replace(/&laquo;|&raquo;/g, '')}
+        </button>
+    ))}
+</div>
+
+</div>
     );
 }

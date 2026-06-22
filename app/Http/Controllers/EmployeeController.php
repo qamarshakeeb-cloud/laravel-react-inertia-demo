@@ -16,7 +16,8 @@ class EmployeeController extends Controller
         ->when($search, function ($query) use ($search) {
             $query->where('name', 'like', "%{$search}%");
         })
-        ->get();
+        ->paginate(10)
+        ->withQueryString();
 
     return Inertia::render('Employees', [
         'employees' => $employees,
