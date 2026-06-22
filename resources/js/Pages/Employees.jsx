@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useForm, router } from '@inertiajs/react';
 
-export default function Employees({ employees, search }) {
+export default function Employees({ employees, search, flash }) {
 
         console.log(employees.links);
 
@@ -39,6 +39,10 @@ export default function Employees({ employees, search }) {
     return (
         <div>
             <h1>Employee List</h1>
+        {flash.success && (
+    <p>{flash.success}</p>
+)}
+
             <input
     type="text"
     placeholder="Search employee..."

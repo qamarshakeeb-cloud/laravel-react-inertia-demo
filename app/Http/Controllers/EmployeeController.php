@@ -14,8 +14,11 @@ class EmployeeController extends Controller
 
     $employees = Employee::query()
         ->when($search, function ($query) use ($search) {
-            $query->where('name', 'like', "%{$search}%");
-        })
+    $query->where(function ($q) use ($search) {
+        $q->where('name', 'like', "%{$search}%")
+          ->orWhere('role', 'like', "%{$search}%");
+    });
+})
         ->paginate(10)
         ->withQueryString();
 
@@ -34,27 +37,36 @@ class EmployeeController extends Controller
 
         Employee::create($request->only(['name', 'role']));
 
-        return redirect()->back();
+return redirect()->back()->with(
+    'success',
+    'Employee created successfully.'
+);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, Employee $employee)
     {
         $request->validate([
             'name' => 'required',
             'role' => 'required',
         ]);
 
-        $employee = Employee::find($id);
+        
         $employee->update($request->only(['name', 'role']));
 
-        return redirect()->back();
+        return redirect()->back()->with(
+    'success',
+    'Employee updated successfully.'
+);
     }
 
-    public function destroy($id)
+    public function destroy(Employee $employee)
     {
-        $employee = Employee::find($id);
+        
         $employee->delete();
 
-        return redirect()->back();
+        return redirect()->back()->with(
+    'success',
+    'Employee deleted successfully.'
+);
     }
 }
