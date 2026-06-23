@@ -1,12 +1,48 @@
 
-import { useState } from 'react';
-import { useForm, router } from '@inertiajs/react';
+import { useState, useEffect, useRef } from 'react';
+import { useForm, router, usePage } from '@inertiajs/react';
+import EmployeeList from '../Components/EmployeeList';
+import EmployeeForm from '../Components/EmployeeForm';
+ import AppLayout from '../Layouts/AppLayout';
 
 export default function Employees({ employees, search, flash }) {
 
-        console.log(employees.links);
+
 
     const [editingId, setEditingId] = useState(null);
+
+    const [searchTerm, setSearchTerm] = useState(search || '');
+
+    const isFirstRender = useRef(true);
+    const { url } = usePage();
+
+    useEffect(() => {
+
+          if (isFirstRender.current) {
+        isFirstRender.current = false;
+        return;
+    }
+
+    const timeout = setTimeout(() => {
+      
+
+
+        router.get(
+    url.split('?')[0],
+    {
+        search: searchTerm,
+    },
+            {
+                preserveState: true,
+                replace: true,
+            }
+        );
+    }, 500);
+
+    return () => clearTimeout(timeout);
+}, [searchTerm]);
+
+    
 
     const { data, setData, post, patch, delete: destroy, errors, reset } = useForm({
         name: '',
@@ -39,6 +75,7 @@ export default function Employees({ employees, search, flash }) {
     return (
         <div>
             <h1>Employee List</h1>
+            
         {flash.success && (
     <p>{flash.success}</p>
 )}
@@ -46,46 +83,25 @@ export default function Employees({ employees, search, flash }) {
             <input
     type="text"
     placeholder="Search employee..."
-    defaultValue={search}
-    onChange={(e) =>
-        router.get(
-            '/employees',
-            { search: e.target.value },
-            {
-                preserveState: true,
-                replace: true,
-            }
-        )
-    }
+    value={searchTerm}
+    onChange={(e) => setSearchTerm(e.target.value)}
 />
+
+
             <p>Editing ID: {editingId}</p>
 
             <form onSubmit={submit}>
-                <input
-                    type="text"
-                    placeholder="Name"
-                    value={data.name}
-                    onChange={(e) => setData('name', e.target.value)}
+
+                <EmployeeForm
+                    data={data}
+                    setData={setData}
+                    errors={errors}
                 />
+                
 
-                {errors.name && (
-                    <p>{errors.name}</p>
-                )}
+                
 
-                <br />
-
-                <input
-                    type="text"
-                    placeholder="Role"
-                    value={data.role}
-                    onChange={(e) => setData('role', e.target.value)}
-                />
-
-                {errors.role && (
-                    <p>{errors.role}</p>
-                )}
-
-                <br />
+                
 
                 <button type="submit">
     {editingId ? 'Update Employee' : 'Add Employee'}
@@ -94,35 +110,14 @@ export default function Employees({ employees, search, flash }) {
 
             <hr />
 
-            {employees.data.map((employee) => (
-    <div key={employee.id}>
-        <p>Name: {employee.name}</p>
-        <p>Role: {employee.role}</p>
+            <EmployeeList
+                employees={employees}
+                destroy={destroy}
+                setEditingId={setEditingId}
+                setData={setData}
+            />
 
-        <button
-            onClick={() => {
-                setEditingId(employee.id);
-
-                setData({
-                    name: employee.name,
-                    role: employee.role,
-                });
-            }}
-        >
-            Edit
-        </button>
-
-        <button
-            onClick={() => {
-                destroy(`/employees/${employee.id}`);
-            }}
-        >
-            Delete
-        </button>
-
-        <hr />
-    </div>
-))}
+            
 
 <div style={{ marginTop: '20px' }}>
     {employees.links.map((link, index) => (
@@ -143,3 +138,6 @@ export default function Employees({ employees, search, flash }) {
 </div>
     );
 }
+
+
+Employees.layout = (page) => <AppLayout>{page}</AppLayout>;
